@@ -1,6 +1,6 @@
 import alpaca_trade_api as tradeapi
-API_KEY = "our key here"
-API_SECRET_KEY = "our secret key here"
+API_KEY = "PKNQBGSA5TOCCDP2G5FD"
+API_SECRET_KEY = "0UAzXe7EZ6ZxMMZnb0gNVoy7ESzgpcdWBODDIAtP"
 api = tradeapi.REST(API_KEY, API_SECRET_KEY, api_version='v2')
 
 class EquityScreener:
@@ -22,4 +22,6 @@ class EquityScreener:
             if self.priceEarningsRatio < stockPtoE and self.dividendYield > stockDividend:
                 self.finalStockPool.append(stock)
             
-
+screener = EquityScreener("", .5, 1)
+screener.getFinancials()
+print(screener.finalStockPool)
