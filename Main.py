@@ -23,17 +23,28 @@ class EquityScreener:
                 self.finalStockPool.append(stock)
 
 class DropScreener:
-    def __init__(self, stocks):
+    def __init__(self, stocks, previousPrice, percentDrop):
         self.stocks = stocks
+        self.previousPrices = previousPrice
+        self.percentDrop = percentDrop
     
+    def getStockTargetPrices(self):
+        stockToTargetPrice = []
+        for stock in self.stocks:
+            stockPreviousPrice = self.previousPrices[stock]
+            stockToTargetPrice = stockPreviousPrice * (1.0 - self.percentDrop)
+        return stockToTargetPrice
             
-
 
 screener = EquityScreener([], .5, 1)
 screener.getFinancials()
 possibleStockPool = screener.finalStockPool
+#prevStockPrices = ...
+dropScreener = DropScreener(possibleStockPool, prevStockPrices, 0.01)
+targetPrices = dropScreener.getStockTargetPrices()
 #get stock prices for each stock at market open or previous close
 #targetPrices = create a map from ticker symbol -> (tickerSymbol price) - 1% drop
+
 #while the time is between 6:00 and 6:15
     #for each stock in possibleStockPool
         #if current price is less than or equal to target price
