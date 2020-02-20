@@ -1,6 +1,8 @@
 import alpaca_trade_api as tradeapi
 import pandas as pd
 import requests
+from yahoo_fin import stock_info as si
+
 API_KEY = "PK8CRHTYAD6NW2DUW5M0"
 API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
 
@@ -46,24 +48,36 @@ class DropScreener:
 #possibleStockPool = screener.finalStockPool
 #print(possibleStockPool)
 
-def get_stock_pool(self):
+def get_stock_pool():
     data = pd.read_excel('res/stock_pool.xlsx')
     data = data.iloc[2:, 1]
     data = data.tolist()
     data.insert(0, 'A')
     return data
 
+def momentum(stock):
+    #TODO: calculate momentum for stock and return True if it passes threshold
+    pass
+
 possibleStockPool = get_stock_pool()
-prevStockPrices = requests.get("https://api.polygon.io/v1/open-close/AAPL/2018-3-2")
+prevStockPrices = requests.get("https://api.polygon.io/v1/open-close/AAPL/2018-3-2", headers={'apiKey':API_KEY, 'secretKey':API_SECRET_KEY})
 print(prevStockPrices.json())
 dropScreener = DropScreener(possibleStockPool, prevStockPrices, 0.01)
 #targetPrices = dropScreener.getStockTargetPrices()
 #targetPrices = dropScreener.getStockTargetPrices()
 #get stock prices for each stock at market open or previous close
 #targetPrices = create a map from ticker symbol -> (tickerSymbol price) - 1% drop
+screenedStockPool = possibleStockPool #TODO: screening
 
 #while the time is between 6:00 and 6:15
     #for each stock in possibleStockPool
         #if current price is less than or equal to target price
             #if momentum is what we want:
                 #print ticker symbol
+momentum = False #TODO: calculate momentums
+while (True): #TODO: change True to time constraints
+    for stock in screenedStockPool:
+        open_price = si.get_quote_table(stock)['Open']
+        current = si.get_live_price(stock)
+        if .98 < current / open_price < .99 and momentum(stock):
+            print(stock)
