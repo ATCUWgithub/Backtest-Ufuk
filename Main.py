@@ -1,12 +1,14 @@
 import alpaca_trade_api as tradeapi
-API_KEY = "PKNQBGSA5TOCCDP2G5FD"
-API_SECRET_KEY = "0UAzXe7EZ6ZxMMZnb0gNVoy7ESzgpcdWBODDIAtP"
+import requests
+API_KEY = "PK8CRHTYAD6NW2DUW5M0"
+API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
+
 api = tradeapi.REST(API_KEY, API_SECRET_KEY, api_version='v2')
 
 class EquityScreener:
     def __init__(self, stocks, priceEarnings, dividend):
         #self.alpaca = 
-        self.stockPool = ["MSFT", "AAPL", "AMZN"]
+        self.stockPool = ["MSFT"]
         self.priceEarningsRatio = priceEarnings
         self.dividendYield = dividend
         self.finalStockPool = []
@@ -15,6 +17,7 @@ class EquityScreener:
         dictionaryEarnings = api.polygon.financials(self.stockPool)
         for stock in self.stockPool:
             stockFinancials = dictionaryEarnings[stock]
+            print(stockFinancials)
             stockResults = stockFinancials["results"]
             stockFinancialInfo = stockResults[0]
             stockPtoE = stockFinancialInfo["priceToEarningsRatio"]
@@ -29,19 +32,25 @@ class DropScreener:
         self.percentDrop = percentDrop
     
     def getStockTargetPrices(self):
-        stockToTargetPrice = []
+        stockToTargetPriceDictionary = {}
         for stock in self.stocks:
             stockPreviousPrice = self.previousPrices[stock]
             stockToTargetPrice = stockPreviousPrice * (1.0 - self.percentDrop)
-        return stockToTargetPrice
+            stockToTargetPriceDictionary[stock] = stockToTargetPrice
+        return stockToTargetPriceDictionary
             
 
-screener = EquityScreener([], .5, 1)
-screener.getFinancials()
-possibleStockPool = screener.finalStockPool
-#prevStockPrices = ...
+#screener = EquityScreener([], .5, 1)
+#screener.getFinancials()
+#possibleStockPool = screener.finalStockPool
+#print(possibleStockPool)
+
+possibleStockPool = ["MSFT"]
+prevStockPrices = requests.get("https://api.polygon.io/v1/open-close/AAPL/2018-3-2")
+print(prevStockPrices.json())
 dropScreener = DropScreener(possibleStockPool, prevStockPrices, 0.01)
-targetPrices = dropScreener.getStockTargetPrices()
+#targetPrices = dropScreener.getStockTargetPrices()
+#targetPrices = dropScreener.getStockTargetPrices()
 #get stock prices for each stock at market open or previous close
 #targetPrices = create a map from ticker symbol -> (tickerSymbol price) - 1% drop
 
