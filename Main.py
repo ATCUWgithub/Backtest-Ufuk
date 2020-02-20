@@ -1,4 +1,5 @@
 import alpaca_trade_api as tradeapi
+import pandas as pd
 import requests
 API_KEY = "PK8CRHTYAD6NW2DUW5M0"
 API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
@@ -45,7 +46,14 @@ class DropScreener:
 #possibleStockPool = screener.finalStockPool
 #print(possibleStockPool)
 
-possibleStockPool = ["MSFT"]
+def get_stock_pool(self):
+    data = pd.read_excel('res/stock_pool.xlsx')
+    data = data.iloc[2:, 1]
+    data = data.tolist()
+    data.insert(0, 'A')
+    return data
+
+possibleStockPool = get_stock_pool()
 prevStockPrices = requests.get("https://api.polygon.io/v1/open-close/AAPL/2018-3-2")
 print(prevStockPrices.json())
 dropScreener = DropScreener(possibleStockPool, prevStockPrices, 0.01)
