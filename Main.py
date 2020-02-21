@@ -59,8 +59,17 @@ def momentum(stock):
     #TODO: calculate momentum for stock and return True if it passes threshold
     pass
 
+#company should be ticker ex: "AAPL" date should be "2018-3-2"
+#returns JSON as seen in polygon documentation
+def openClose(company, date):
+    url = "https://api.polygon.io/v1/open-close/"
+    url = url + company + "/"
+    url = url + date
+    data = requests.get(url, headers={'apiKey':API_KEY, 'secretKey':API_SECRET_KEY})
+    return data
+
 possibleStockPool = get_stock_pool()
-prevStockPrices = requests.get("https://api.polygon.io/v1/open-close/AAPL/2018-3-2", headers={'apiKey':API_KEY, 'secretKey':API_SECRET_KEY})
+prevStockPrices = openClose("AAPL", "2019-2-21")
 print(prevStockPrices.json())
 dropScreener = DropScreener(possibleStockPool, prevStockPrices, 0.01)
 #targetPrices = dropScreener.getStockTargetPrices()
