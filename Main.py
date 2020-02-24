@@ -2,6 +2,8 @@ import alpaca_trade_api as tradeapi
 import pandas as pd
 import requests
 from yahoo_fin import stock_info as si
+from pytz import timezone
+from datetime import datetime
 
 API_KEY = "PK8CRHTYAD6NW2DUW5M0"
 API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
@@ -83,8 +85,12 @@ screenedStockPool = possibleStockPool #TODO: screening
         #if current price is less than or equal to target price
             #if momentum is what we want:
                 #print ticker symbol
+est = timezone('EST')
+date_now = datetime.now(est)
+lower_bound = date_now.replace(hour=6, minute=1)
+upper_bound = date_now.replace(hour=6, minute=15)
 momentum = False #TODO: calculate momentums
-while (True): #TODO: change True to time constraints
+while lower_bound < datetime.now(est) < upper_bound: #TODO:
     for stock in screenedStockPool:
         open_price = si.get_quote_table(stock)['Open']
         current = si.get_live_price(stock)
