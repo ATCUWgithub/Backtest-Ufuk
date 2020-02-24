@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 from yahoo_fin import stock_info as si
 from pytz import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 
 API_KEY = "PK8CRHTYAD6NW2DUW5M0"
 API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
@@ -58,7 +58,7 @@ def get_stock_pool():
     return data
 
 def momentum(stock):
-    #TODO: calculate momentum for stock and return True if it passes threshold
+    date_wks_ago = datetime.now() - timedelta(weeks=2)
     pass
 
 #company should be ticker ex: "AAPL" date should be "2018-3-2"
