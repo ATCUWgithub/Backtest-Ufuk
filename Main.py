@@ -1,6 +1,7 @@
 import alpaca_trade_api as tradeapi
 import pandas as pd
 import requests
+import json
 from yahoo_fin import stock_info as si
 from pytz import timezone
 from datetime import datetime, timedelta
@@ -13,13 +14,14 @@ api = tradeapi.REST(API_KEY, API_SECRET_KEY, api_version='v2')
 est = timezone('EST')
 
 class EquityScreener:
+    #input a pool of stocks, a price to earnings ration, and a dividend yield
     def __init__(self, stocks, priceEarnings, dividend):
-        #self.alpaca = 
-        self.stockPool = ["MSFT"]
+        self.stockPool = stocks
         self.priceEarningsRatio = priceEarnings
         self.dividendYield = dividend
         self.finalStockPool = []
 
+    #screens stocks based in earnings and dividend yields
     def getFinancials(self):
         dictionaryEarnings = api.polygon.financials(self.stockPool)
         for stock in self.stockPool:
@@ -29,29 +31,12 @@ class EquityScreener:
             stockFinancialInfo = stockResults[0]
             stockPtoE = stockFinancialInfo["priceToEarningsRatio"]
             stockDividend = stockFinancialInfo["dividendYield"]
-            if self.priceEarningsRatio < stockPtoE and self.dividendYield > stockDividend:
+            #if STOCK'S price/earnings ratio is lower than input, and dividend yield greater than input
+            #then stock has passed screening
+            if self.priceEarningsRatio >= stockPtoE and self.dividendYield <= stockDividend:
                 self.finalStockPool.append(stock)
-
-class DropScreener:
-    def __init__(self, stocks, previousPrice, percentDrop):
-        self.stocks = stocks
-        self.previousPrices = previousPrice
-        self.percentDrop = percentDrop
-    
-    def getStockTargetPrices(self):
-        stockToTargetPriceDictionary = {}
-        for stock in self.stocks:
-            stockPreviousPrice = self.previousPrices[stock]
-            stockToTargetPrice = stockPreviousPrice * (1.0 - self.percentDrop)
-            stockToTargetPriceDictionary[stock] = stockToTargetPrice
-        return stockToTargetPriceDictionary
             
-
-#screener = EquityScreener([], .5, 1)
-#screener.getFinancials()
-#possibleStockPool = screener.finalStockPool
-#print(possibleStockPool)
-
+#reads in a stock pool from a given excel sheet
 def get_stock_pool():
     data = pd.read_excel('res/stock_pool.xlsx')
     data = data.iloc[2:, 1]
@@ -86,42 +71,37 @@ def momentum(stock):
     # Calculate the RSI based on EWMA
     RS1 = roll_up1 / roll_down1
     RSI1 = 100.0 - (100.0 / (1.0 + RS1))
-    return RSI1 > 70.0
 
+    hasHighMomentum = RSI1 > 70.0 #change momentum screening here
+    return (hasHighMomentum, RSI1)
 
+#list of stock symbols from pool
+stockPool = get_stock_pool()
 
-#company should be ticker ex: "AAPL" date should be "2018-3-2"
-#returns JSON as seen in polygon documentation
-def openClose(company, date):
-    url = "https://api.polygon.io/v1/open-close/"
-    url = url + company + "/"
-    url = url + date
-    data = requests.get(url, headers={'apiKey':API_KEY, 'secretKey':API_SECRET_KEY})
-    return data
+#openPrices is a dictionary of (stockSymbol) -> (stocks opening price)
+openPrices = {}
+for stockSymbol in stockPool:
+    openPrice = si.get_quote_table(stockSymbol)['Open']
+    openPrices[stockSymbol] = openPrice
 
-possibleStockPool = get_stock_pool()
-prevStockPrices = openClose("AAPL", "2019-2-21")
-print(prevStockPrices.json())
-dropScreener = DropScreener(possibleStockPool, prevStockPrices, 0.01)
-#targetPrices = dropScreener.getStockTargetPrices()
-#targetPrices = dropScreener.getStockTargetPrices()
-#get stock prices for each stock at market open or previous close
-#targetPrices = create a map from ticker symbol -> (tickerSymbol price) - 1% drop
-screenedStockPool = possibleStockPool #TODO: screening
-
-#while the time is between 6:00 and 6:15
-    #for each stock in possibleStockPool
-        #if current price is less than or equal to target price
-            #if momentum is what we want:
-                #print ticker symbol
-
-date_now = datetime.now(est)
+#During 6:00 - 6:15 compare opening price to current, printing a stock symbol if
+#the drop criteria and the momentum criteria is met
+date_now = datetime.now(est) #suppossed to be pst?
 lower_bound = date_now.replace(hour=6, minute=1)
 upper_bound = date_now.replace(hour=6, minute=15)
-momentum = False #TODO: calculate momentums
-while lower_bound < datetime.now(est) < upper_bound: #TODO:
-    for stock in screenedStockPool:
-        open_price = si.get_quote_table(stock)['Open']
+while lower_bound < datetime.now(est) < upper_bound:
+    for stock in stockPool:
+        open_price = openPrices[stock]
         current = si.get_live_price(stock)
-        if .98 < current / open_price < .99 and momentum(stock):
-            print(stock)
+        currentOverOpenPrice = current / open_price
+        stockMomentum = momentum(stock)
+        if .98 < currentOverOpenPrice < .99 and stockMomentum[0]: #change drop parameters here
+            percentDrop = 1.0 - currentOverOpenPrice
+            rsi = stockMomentum[1]
+            stockInfo = {
+                "symbol": stock,
+                "percentDrop": percentDrop,
+                "rsi": rsi
+            }
+            stockInfoJson = json.dumps(stockInfo)
+            print(stockInfoJson)
