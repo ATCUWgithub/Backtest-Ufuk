@@ -60,11 +60,34 @@ def get_stock_pool():
     return data
 
 #todo: change to 14 days of market open
+#stock is a string representing ticker symbol
 def momentum(stock):
     date_2wks_ago = datetime.now(est) - timedelta(weeks=2)
     date_2wks_ago = date_2wks_ago.strftime('%m/%d/%Y')
     date_today = datetime.now(est) - timedelta(days=1)
     date_today = date_today.strftime('%m/%d/%Y')
+    pandasDataFrame = si.get_data(stock, date_2wks_ago, date_today, True, "1d")
+    
+    # Get the difference in price from previous step
+    delta = close.diff()
+    # Get rid of the first row, which is NaN since it did not have a previous 
+    # row to calculate the differences
+    delta = delta[1:] 
+
+    # Make the positive gains (up) and negative gains (down) Series
+    up, down = delta.copy(), delta.copy()
+    up[up < 0] = 0
+    down[down > 0] = 0
+
+    # Calculate the EWMA
+    roll_up1 = up.ewm(span=window_length).mean()
+    roll_down1 = down.abs().ewm(span=window_length).mean()
+
+    # Calculate the RSI based on EWMA
+    RS1 = roll_up1 / roll_down1
+    RSI1 = 100.0 - (100.0 / (1.0 + RS1)
+
+
 
 #company should be ticker ex: "AAPL" date should be "2018-3-2"
 #returns JSON as seen in polygon documentation
