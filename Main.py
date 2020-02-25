@@ -10,6 +10,8 @@ API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
 
 api = tradeapi.REST(API_KEY, API_SECRET_KEY, api_version='v2')
 
+est = timezone('EST')
+
 class EquityScreener:
     def __init__(self, stocks, priceEarnings, dividend):
         #self.alpaca = 
@@ -57,9 +59,12 @@ def get_stock_pool():
     data.insert(0, 'A')
     return data
 
+#todo: change to 14 days of market open
 def momentum(stock):
-    date_wks_ago = datetime.now() - timedelta(weeks=2)
-    pass
+    date_2wks_ago = datetime.now(est) - timedelta(weeks=2)
+    date_2wks_ago = date_2wks_ago.strftime('%m/%d/%Y')
+    date_today = datetime.now(est) - timedelta(days=1)
+    date_today = date_today.strftime('%m/%d/%Y')
 
 #company should be ticker ex: "AAPL" date should be "2018-3-2"
 #returns JSON as seen in polygon documentation
@@ -85,7 +90,7 @@ screenedStockPool = possibleStockPool #TODO: screening
         #if current price is less than or equal to target price
             #if momentum is what we want:
                 #print ticker symbol
-est = timezone('EST')
+
 date_now = datetime.now(est)
 lower_bound = date_now.replace(hour=6, minute=1)
 upper_bound = date_now.replace(hour=6, minute=15)
