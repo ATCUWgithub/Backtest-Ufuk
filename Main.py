@@ -66,10 +66,10 @@ def momentum(stock):
     date_2wks_ago = date_2wks_ago.strftime('%m/%d/%Y')
     date_today = datetime.now(est) - timedelta(days=1)
     date_today = date_today.strftime('%m/%d/%Y')
-    pandasDataFrame = si.get_data(stock, date_2wks_ago, date_today, True, "1d")
+    two_week_data = si.get_data(stock, date_2wks_ago, date_today, True, "1d")
     
     # Get the difference in price from previous step
-    delta = close.diff()
+    delta = two_week_data.diff()
     # Get rid of the first row, which is NaN since it did not have a previous 
     # row to calculate the differences
     delta = delta[1:] 
@@ -80,12 +80,13 @@ def momentum(stock):
     down[down > 0] = 0
 
     # Calculate the EWMA
-    roll_up1 = up.ewm(span=window_length).mean()
-    roll_down1 = down.abs().ewm(span=window_length).mean()
+    roll_up1 = up.ewm().mean()
+    roll_down1 = down.abs().ewm().mean()
 
     # Calculate the RSI based on EWMA
     RS1 = roll_up1 / roll_down1
-    RSI1 = 100.0 - (100.0 / (1.0 + RS1)
+    RSI1 = 100.0 - (100.0 / (1.0 + RS1))
+    return RSI1 > 70.0
 
 
 
