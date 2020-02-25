@@ -86,9 +86,9 @@ for stockSymbol in stockPool:
 
 #During 6:00 - 6:15 compare opening price to current, printing a stock symbol if
 #the drop criteria and the momentum criteria is met
-date_now = datetime.now(est) #suppossed to be pst?
-lower_bound = date_now.replace(hour=6, minute=1)
-upper_bound = date_now.replace(hour=6, minute=15)
+date_now = datetime.now(est)
+lower_bound = date_now.replace(hour=9, minute=1)
+upper_bound = date_now.replace(hour=9, minute=15)
 while lower_bound < datetime.now(est) < upper_bound:
     for stock in stockPool:
         open_price = openPrices[stock]
