@@ -76,32 +76,53 @@ def momentum(stock):
     return (hasHighMomentum, RSI1)
 
 #list of stock symbols from pool
-stockPool = get_stock_pool()
+#stockPool = get_stock_pool()
 
 #openPrices is a dictionary of (stockSymbol) -> (stocks opening price)
-openPrices = {}
-for stockSymbol in stockPool:
-    openPrice = si.get_quote_table(stockSymbol)['Open']
-    openPrices[stockSymbol] = openPrice
+def getOpenPrices():
+    openPrices = {}
+    stockPool = get_stock_pool()
+    for stockSymbol in stockPool:
+        openPrice = si.get_quote_table(stockSymbol)['Open']
+        openPrices[stockSymbol] = openPrice
+    return openPrices
 
+#openPrices = getOpenPrices()
 #During 6:00 - 6:15 compare opening price to current, printing a stock symbol if
 #the drop criteria and the momentum criteria is met
-date_now = datetime.now(est)
-lower_bound = date_now.replace(hour=9, minute=1)
-upper_bound = date_now.replace(hour=9, minute=15)
-while lower_bound < datetime.now(est) < upper_bound:
-    for stock in stockPool:
-        open_price = openPrices[stock]
-        current = si.get_live_price(stock)
+
+#date_now = datetime.now(est)
+#lower_bound = date_now.replace(hour=9, minute=1)
+#upper_bound = date_now.replace(hour=9, minute=15)
+#while lower_bound < datetime.now(est) < upper_bound:
+    #for stock in stockPool:
+        #open_price = openPrices[stock]
+        #current = si.get_live_price(stock)
+        #currentOverOpenPrice = current / open_price
+        #stockMomentum = momentum(stock)
+        #if .98 < currentOverOpenPrice < .99 and stockMomentum[0]: #change drop parameters here
+            #percentDrop = 1.0 - currentOverOpenPrice
+            #rsi = stockMomentum[1]
+            #stockInfo = {
+                #symbol": stock,
+                #"percentDrop": percentDrop,
+                #"rsi": rsi
+           #}
+            #stockInfoJson = json.dumps(stockInfo)
+            #print(stockInfoJson)
+
+def apiCall():
+    stocks = get_stock_pool()
+    openPrices = getOpenPrices()
+    currentDictionary = {}
+    for ticker in stocks:
+        open_price = openPrices[ticker]
+        current = si.get_live_price(ticker)
         currentOverOpenPrice = current / open_price
-        stockMomentum = momentum(stock)
-        if .98 < currentOverOpenPrice < .99 and stockMomentum[0]: #change drop parameters here
+        if (0.98 < currentOverOpenPrice and currentOverOpenPrice < 0.99):
             percentDrop = 1.0 - currentOverOpenPrice
-            rsi = stockMomentum[1]
-            stockInfo = {
-                "symbol": stock,
-                "percentDrop": percentDrop,
-                "rsi": rsi
-            }
-            stockInfoJson = json.dumps(stockInfo)
-            print(stockInfoJson)
+            currentDictionary[ticker] = percentDrop
+    stockInfoJson = json.dumps(currentDictionary)
+    return stockInfoJson        
+
+
