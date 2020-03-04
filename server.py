@@ -2,8 +2,10 @@ from flask import Flask, jsonify, request
 from waitress import serve
 
 from error import InvalidUsage
-from reccomend import matching_score
-import stockFilter
+
+from stockFilter import get_stock_pool
+from stockFilter import getOpenPrices
+from stockFilter import get_drawdowns
 
 app = Flask(__name__)
 
@@ -29,21 +31,24 @@ def handle_invalid_usage(error):
     response.status_code = error.status_code
     return response
 
+@app.route('/updateStockPool', methods=['POST'])
+def update_stock_pool():
+    #updates the stock pool in stockFilter
+    get_stock_pool()
+    return 'Stock pool has been updated'
 
-@app.route('/getReccomendations', methods=['POST'])
-def reccomend_book():
+@app.route('/updateOpenPrices', methods=['POST'])
+def updateOpenPrices():
+    #updates the opening prices dictionary in stockFilter
+    getOpenPrices()
+    return 'Opening prices have been updated'
 
-    if not has_args(request.json, ['numResponses']):
-        raise InvalidUsage(
-            'Please provide the number of responses you want to recieve.')
+@app.route('/getDrawdowns', methods=['POST'])
+def getDrawdowns():
+    #returns a json of {tickerSymbol:percentDrawDown} for all tickerSymbols with
+    #drawdowns between 1%-2% since the market open
+    return get_drawdowns()
 
-    if not has_args(request.json, ['query']):
-        raise InvalidUsage('Please provide a query to match with.')
-
-    query, titles = matching_score(
-        request.json['numResponses'], request.json['query'])
-
-    return jsonify({'query': query, 'query': titles})
 
 
 # if __name__ == '__main__':
