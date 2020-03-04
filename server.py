@@ -3,6 +3,7 @@ from waitress import serve
 
 from error import InvalidUsage
 from reccomend import matching_score
+import stockFilter
 
 app = Flask(__name__)
 
