@@ -92,6 +92,7 @@ def getOpenPrices():
     stocks = get_stock_pool()
     for stockSymbol in stocks:
         openPrice = si.get_quote_table(stockSymbol)['Open']
+        #print(openPrice)
         updateOpenPrices[stockSymbol] = openPrice
     openPrices = updateOpenPrices
     return("Updated Open Prices for")
@@ -134,5 +135,7 @@ def get_drawdowns():
     return stockInfoJson
 
 
-openPrices = getOpenPrices()
+openPrices = None
+getOpenPrices()
 stocks = get_stock_pool()
+
