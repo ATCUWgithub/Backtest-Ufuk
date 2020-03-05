@@ -22,7 +22,7 @@ def has_args(iterable, args):
 
 @app.route('/', methods=['GET'])
 def ping():
-    return 'Jarvis, start the engines.'
+    return 'API running.'
 
 
 @app.errorhandler(InvalidUsage)
@@ -53,7 +53,9 @@ def getDrawdowns():
     return get_drawdowns()
 
 
-# if __name__ == '__main__':
-#     app.run()
+if __name__ == '__main__':
+    app.debug = True
+    app.run()
+
 
 serve(app, host='0.0.0.0', port=3000)
