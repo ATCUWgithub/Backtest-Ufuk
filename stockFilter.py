@@ -87,9 +87,9 @@ def momentum(stock):
 # openPrices is a dictionary of (stockSymbol) -> (stocks opening price)
 
 def getOpenPrice(ticker):
-    barset = api.get_barset('AAPL', 'day', limit=1)
-    barset = barset['AAPL']
-    return barset.o
+    barset = api.get_barset(ticker, 'day', limit=1)
+    barset = barset[ticker]
+    return barset[0].o
 
 def getOpenPrices():
     updateOpenPrices = {}
