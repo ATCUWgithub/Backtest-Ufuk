@@ -92,8 +92,9 @@ def getOpenPrices():
     stocks = get_stock_pool()
     for stockSymbol in stocks:
         openPrice = -1.0
-        if 'Open' in open:
-            openPrice = si.get_quote_table(stockSymbol)['Open']
+        stockData = si.get_quote_table(stockSymbol)
+        if 'Open' in stockData:
+            openPrice = stockData['Open']
         #print(openPrice)
         updateOpenPrices[stockSymbol] = openPrice
     openPrices = updateOpenPrices
