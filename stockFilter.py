@@ -95,10 +95,9 @@ def getOpenPrices():
     updateOpenPrices = {}
     stocks = get_stock_pool()
     for stockSymbol in stocks:
-        openPrice = -1.0
-        stockData = getOpenPrice(stockSymbol)
+        stockOpenPrice = getOpenPrice(stockSymbol)
         #print(openPrice)
-        updateOpenPrices[stockSymbol] = openPrice
+        updateOpenPrices[stockSymbol] = stockOpenPrice
     openPrices = updateOpenPrices
     return("Updated Open Prices for")
 
