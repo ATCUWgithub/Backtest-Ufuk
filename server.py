@@ -31,19 +31,19 @@ def handle_invalid_usage(error):
     response.status_code = error.status_code
     return response
 
-@app.route('/updateStockPool', methods=['POST'])
+@app.route('/updateStockPool', methods=['GET'])
 def update_stock_pool():
     #updates the stock pool in stockFilter
     get_stock_pool()
     return 'Stock pool has been updated'
 
-@app.route('/updateOpenPrices', methods=['POST'])
+@app.route('/updateOpenPrices', methods=['GET'])
 def updateOpenPrices():
     #updates the opening prices dictionary in stockFilter
     getOpenPrices()
     return 'Opening prices have been updated'
 
-@app.route('/getDrawdowns', methods=['POST'])
+@app.route('/getDrawdowns', methods=['GET'])
 def getDrawdowns():
     #returns a json of {tickerSymbol:percentDrawDown} for all tickerSymbols with
     #drawdowns between 1%-2% since the market open
