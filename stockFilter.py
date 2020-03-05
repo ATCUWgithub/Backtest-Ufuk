@@ -97,8 +97,6 @@ def getOpenPrices():
     for stockSymbol in stocks:
         openPrice = -1.0
         stockData = getOpenPrice(stockSymbol)
-        if 'Open' in stockData:
-            openPrice = stockData['Open']
         #print(openPrice)
         updateOpenPrices[stockSymbol] = openPrice
     openPrices = updateOpenPrices
