@@ -46,7 +46,7 @@ def get_stock_pool():
     data = data.tolist()
     data.insert(0, 'A')
     stocks = data
-    return "Updated Stock Tickers to be evaluated."
+    return stocks
 
 # todo: change to 14 days of market open
 # stock is a string representing ticker symbol
@@ -95,11 +95,16 @@ def getOpenPrices():
     updateOpenPrices = {}
     stocks = get_stock_pool()
     for stockSymbol in stocks:
-        stockOpenPrice = getOpenPrice(stockSymbol)
+        try:
+            stockOpenPrice = getOpenPrice(stockSymbol)
+            print('open price is %s', stockOpenPrice)
+        except:
+            print("No open price")
+            stockOpenPrice = -1
         #print(openPrice)
         updateOpenPrices[stockSymbol] = stockOpenPrice
     openPrices = updateOpenPrices
-    return("Updated Open Prices for")
+    return openPrices
 
 
 # During 6:00 - 6:15 compare opening price to current, printing a stock symbol if
@@ -137,9 +142,3 @@ def get_drawdowns():
             currentDictionary[ticker] = percentDrop
     stockInfoJson = json.dumps(currentDictionary)
     return stockInfoJson
-
-
-# openPrices = None
-# getOpenPrices()
-# stocks = get_stock_pool()
-

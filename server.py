@@ -42,8 +42,8 @@ def update_stock_pool():
 @app.route('/updateOpenPrices', methods=['POST'])
 def updateOpenPrices():
     # updates the opening prices dictionary in stockFilter
-    getOpenPrices()
-    return 'Opening prices have been updated'
+    prices = getOpenPrices()
+    return prices
 
 
 @app.route('/getDrawdowns', methods=['POST'])
