@@ -88,13 +88,12 @@ def momentum(stock):
 
 
 def getOpenPrices():
-    updateOpenPrices = {}
+    updatedOpenPrices = {}
     stocks = get_stock_pool()
     for stockSymbol in stocks:
         openPrice = si.get_quote_table(stockSymbol)['Open']
-        updateOpenPrices[stockSymbol] = openPrice
-    openPrices = updateOpenPrices
-    return("Updated Open Prices for")
+        updatedOpenPrices[stockSymbol] = openPrice
+    return updatedOpenPrices
 
 
 # During 6:00 - 6:15 compare opening price to current, printing a stock symbol if
