@@ -40,8 +40,6 @@ class EquityScreener:
 # reads in a stock pool from a given excel sheet
 
 
-
-
 def get_stock_pool():
     data = pd.read_excel('res/stock_pool.xlsx')
     data = data.iloc[2:, 1]
@@ -134,5 +132,7 @@ def get_drawdowns():
             currentDictionary[ticker] = percentDrop
     stockInfoJson = json.dumps(currentDictionary)
     return stockInfoJson
+
+
 openPrices = getOpenPrices()
 stocks = get_stock_pool()
