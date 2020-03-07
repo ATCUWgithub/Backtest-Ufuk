@@ -5,6 +5,7 @@ import json
 from yahoo_fin import stock_info as si
 from pytz import timezone
 from datetime import datetime, timedelta
+import os
 
 API_KEY = "PK8CRHTYAD6NW2DUW5M0"
 API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
@@ -16,12 +17,8 @@ est = timezone('EST')
 
 class EquityScreener:
     # input a pool of stocks, a price to earnings ration, and a dividend yield
-    def __init__(self, stocks, priceEarnings, dividend):
-        self.stockPool = stocks
-        self.priceEarningsRatio = priceEarnings
-        self.dividendYield = dividend
-        self.finalStockPool = []
-
+    def __init__(self):
+        print('constructed')
     # screens stocks based in earnings and dividend yields
     def getFinancials(self):
         dictionaryEarnings = api.polygon.financials(self.stockPool)
@@ -37,16 +34,98 @@ class EquityScreener:
             if self.priceEarningsRatio >= stockPtoE and self.dividendYield <= stockDividend:
                 self.finalStockPool.append(stock)
 
-# reads in a stock pool from a given excel sheet
+
+    def serveData(self):
+        return self.stocks
+
+    def getCurPrice(self, ticker):
+        barset = api.get_barset(ticker, 'minute', limit=10, start=datetime(datetime.now().year, datetime.now().month, datetime.now().day, 9, 0, 0, 0).isoformat())
+        a = barset[ticker][-1].c
+        self.tested = a
+        return a
+
+    def updateCurPrices(self):
+        curPrices = {}
+        for stockSymbol in self.get_stock_pool():
+            try:
+                stockPrice = self.getCurPrice(stockSymbol)
+            except:
+                print("No price")
+                stockPrice = -1
+            # print(openPrice)
+            curPrices[stockSymbol] = stockPrice
+        try:
+            os.remove('curPrices.json')
+            print('cleared')
+        except:
+            print('cleared')
+        with open('curPrices.json', 'w') as json_file:
+            json.dump(curPrices, json_file)
+        return curPrices
 
 
-def get_stock_pool():
-    data = pd.read_excel('res/stock_pool.xlsx')
-    data = data.iloc[2:, 1]
-    data = data.tolist()
-    data.insert(0, 'A')
-    stocks = data
-    return stocks
+
+    def get_stock_pool(self):
+        data = pd.read_csv('stock_pool.csv')
+        #data = data.iloc[2:, 1]
+        #data = data.tolist()
+        #data.insert(0, 'A')
+        #stocks = data
+        return data['A']
+
+
+    def getOpenPrice(self, ticker):
+        barset = api.get_barset(ticker, 'day', limit=1)
+        barset = barset[ticker]
+        return barset[0].o
+
+
+    def getOpenPrices(self):
+
+        updateOpenPrices = {}
+        for i in self.get_stock_pool():
+            try:
+                stockOpenPrice = self.getOpenPrice(i)
+                print('open price is %s', stockOpenPrice)
+            except:
+                print("No open price")
+                stockOpenPrice = -1
+            updateOpenPrices[i] = stockOpenPrice
+
+        with open('openPrices.json', 'w') as json_file:
+            json.dump(updateOpenPrices, json_file)
+        return updateOpenPrices
+
+
+def dd():
+    cur = serveCurPrices()
+    op = serveOpenPrices()
+    dd = {}
+    s = pd.read_csv('stock_pool.csv')
+    s = s['A']
+    for i in s:
+        pr = cur[i]
+        oR = op[i]
+        dd[i] = (oR - pr)/pr
+    try:
+        os.remove('drawdown.json')
+        print('cleared')
+    except:
+        print('cleared')
+    with open('drawdown.json', 'w') as json_file:
+        json.dump(dd, json_file)
+    return dd
+
+def serveOpenPrices():
+    with open('openPrices.json') as f:
+        data = json.load(f)
+    return data
+
+
+def serveCurPrices():
+    with open('curPrices.json') as f:
+        data = json.load(f)
+    return data
 
 # todo: change to 14 days of market open
 # stock is a string representing ticker symbol
@@ -87,26 +166,7 @@ def momentum(stock):
 # openPrices is a dictionary of (stockSymbol) -> (stocks opening price)
 
 
-def getOpenPrice(ticker):
-    barset = api.get_barset(ticker, 'day', limit=1)
-    barset = barset[ticker]
-    return barset[0].o
 
-
-def getOpenPrices():
-    updateOpenPrices = {}
-    stocks = get_stock_pool()
-    for stockSymbol in stocks:
-        try:
-            stockOpenPrice = getOpenPrice(stockSymbol)
-            print('open price is %s', stockOpenPrice)
-        except:
-            print("No open price")
-            stockOpenPrice = -1
-        # print(openPrice)
-        updateOpenPrices[stockSymbol] = stockOpenPrice
-    openPrices = updateOpenPrices
-    return openPrices
 
 
 # During 6:00 - 6:15 compare opening price to current, printing a stock symbol if
