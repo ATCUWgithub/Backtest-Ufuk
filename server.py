@@ -5,6 +5,7 @@ from error import InvalidUsage
 
 from stockFilter import get_stock_pool
 from stockFilter import getOpenPrices
+from stockFilter import getOpenPrice
 from stockFilter import get_drawdowns
 
 app = Flask(__name__)
@@ -48,6 +49,15 @@ def updateOpenPrices():
     # updates the opening prices dictionary in stockFilter
     prices = getOpenPrices()
     return prices
+
+
+@app.route('/updateOpenPrice', methods=['POST'])
+def updateOpenPrice():
+    if not has_args(request.json, ['ticker']):
+        raise InvalidUsage('Please provide ticker to get the open price for.')
+
+    open_price = getOpenPrice(request.json['ticker'])
+    return jsonify({'ticker': request.json['ticker'], 'Open Price': open_price})
 
 
 @app.route('/getDrawdowns', methods=['POST'])
