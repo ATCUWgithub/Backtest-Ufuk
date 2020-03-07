@@ -41,6 +41,10 @@ def update_stock_pool():
 
 @app.route('/updateOpenPrices', methods=['POST'])
 def updateOpenPrices():
+
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+
     # updates the opening prices dictionary in stockFilter
     prices = getOpenPrices()
     return prices
