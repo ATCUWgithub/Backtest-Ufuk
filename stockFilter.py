@@ -1,7 +1,4 @@
 import alpaca_trade_api as tradeapi
-import pandas as pd
-import requests
-import json
 from yahoo_fin import stock_info as si
 from pytz import timezone
 from datetime import datetime, timedelta
@@ -14,16 +11,14 @@ api = tradeapi.REST(API_KEY, API_SECRET_KEY, api_version='v2')
 est = timezone('EST')
 
 
-def set_stock_pool():
-    data = pd.read_excel('res/stock_pool.xlsx')
-    data = data.iloc[2:, 1]
-    data = data.tolist()
-    data.insert(0, 'A')
-    stocks = data
-    return stocks
-
-
 def get_open_price(ticker):
+    """
+    Gets the opening price for the given ticker. Uses Polygon through Aplaca.
+    :param 
+        ticker: ticker of stock.
+    :return: the opening price 
+    """
+
     today = datetime.now()
     try:
         open_price = api.polygon.daily_open_close(ticker, today).open
@@ -33,11 +28,27 @@ def get_open_price(ticker):
 
 
 def get_current_price(ticker):
+    """
+    Gets the current price for the given ticker. Uses Yahoo Finance.
+    :param 
+        ticker: ticker of stock.
+    :return: the current price 
+    """
+
     current = si.get_live_price(ticker)
     return current
 
 
 def get_drawdown(ticker, open_price=None, current_price=None):
+    """
+    Gets the current price for the given ticker. Uses Yahoo Finance.
+    :params:
+        ticker: ticker of stock.
+        open_price: The opening price of given stock. If not passed, sets internally.
+        current_price: The current price of given stock. If not passed, sets internally.
+    :return: the percentage change from open to now. 
+    """
+
     if open_price is None:
         open_price = getOpenPrice(ticker)
     if current_price is None:
@@ -52,6 +63,13 @@ def get_drawdown(ticker, open_price=None, current_price=None):
 
 
 def get_close_price(ticker):
+    """
+    Gets the close price for the given ticker. Uses Polygon through Aplaca.
+    :param 
+        ticker: ticker of stock.
+    :return: the close price 
+    """
+
     today = datetime.now()
     last_close_day = prev_weekday(today)
     try:
@@ -69,6 +87,14 @@ def prev_weekday(adate):
 
 
 def get_all_data(ticker):
+    """
+    Calls all the methods within this script to aggregate and return singular dict file for
+    API usage and parsing. 
+    :param 
+        ticker: ticker of stock.
+    :return: dict of open, close, current, drawdown percentage, ticker, and boolean to display or not. 
+    """
+
     data_dictionary = {}
     data_dictionary["Symbol"] = ticker
     open_price = get_open_price(ticker)
