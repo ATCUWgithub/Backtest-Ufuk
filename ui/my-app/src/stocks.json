@@ -25,5 +25,14 @@
             "price": [25,12,32,32,14],
             "time": [5,10,15,20,25]
         }
-    ]
+    ],
+
+    "response": {
+        "Current Price": 289.0299987792969,
+        "Display?": false,
+        "Drawdown % ": -1,
+        "Open Price": -1,
+        "Previous Close Price": 287.61,
+        "Symbol": "AAPL"
+    }
 }

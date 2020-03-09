@@ -17,13 +17,13 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      stocks:[]
+      stocks:[],
+      response: {}
     };
   }
   
   componentDidMount() {
-    this.setState({stocks: SAMPLE_DATA.stocks});
-    
+    this.setState({stocks: SAMPLE_DATA.stocks, response: SAMPLE_DATA.response});
   }
 
   render() {
