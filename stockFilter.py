@@ -1,7 +1,4 @@
 import alpaca_trade_api as tradeapi
-import pandas as pd
-import requests
-import json
 from yahoo_fin import stock_info as si
 from pytz import timezone
 from datetime import datetime, timedelta
@@ -14,133 +11,101 @@ api = tradeapi.REST(API_KEY, API_SECRET_KEY, api_version='v2')
 est = timezone('EST')
 
 
-class EquityScreener:
-    # input a pool of stocks, a price to earnings ration, and a dividend yield
-    def __init__(self, stocks, priceEarnings, dividend):
-        self.stockPool = stocks
-        self.priceEarningsRatio = priceEarnings
-        self.dividendYield = dividend
-        self.finalStockPool = []
+def get_open_price(ticker):
+    """
+    Gets the opening price for the given ticker. Uses Polygon through Aplaca.
+    :param 
+        ticker: ticker of stock.
+    :return: the opening price 
+    """
 
-    # screens stocks based in earnings and dividend yields
-    def getFinancials(self):
-        dictionaryEarnings = api.polygon.financials(self.stockPool)
-        for stock in self.stockPool:
-            stockFinancials = dictionaryEarnings[stock]
-            print(stockFinancials)
-            stockResults = stockFinancials["results"]
-            stockFinancialInfo = stockResults[0]
-            stockPtoE = stockFinancialInfo["priceToEarningsRatio"]
-            stockDividend = stockFinancialInfo["dividendYield"]
-            # if STOCK'S price/earnings ratio is lower than input, and dividend yield greater than input
-            # then stock has passed screening
-            if self.priceEarningsRatio >= stockPtoE and self.dividendYield <= stockDividend:
-                self.finalStockPool.append(stock)
-
-# reads in a stock pool from a given excel sheet
+    today = datetime.now()
+    try:
+        open_price = api.polygon.daily_open_close(ticker, today).open
+    except:
+        return -1
+    return open_price
 
 
-def get_stock_pool():
-    data = pd.read_excel('res/stock_pool.xlsx')
-    data = data.iloc[2:, 1]
-    data = data.tolist()
-    data.insert(0, 'A')
-    stocks = data
-    return stocks
+def get_current_price(ticker):
+    """
+    Gets the current price for the given ticker. Uses Yahoo Finance.
+    :param 
+        ticker: ticker of stock.
+    :return: the current price 
+    """
 
-# todo: change to 14 days of market open
-# stock is a string representing ticker symbol
-
-
-def momentum(stock):
-    date_2wks_ago = datetime.now(est) - timedelta(weeks=2)
-    date_2wks_ago = date_2wks_ago.strftime('%m/%d/%Y')
-    date_today = datetime.now(est) - timedelta(days=1)
-    date_today = date_today.strftime('%m/%d/%Y')
-    two_week_data = si.get_data(stock, date_2wks_ago, date_today, True, "1d")
-
-    # Get the difference in price from previous step
-    delta = two_week_data.diff()
-    # Get rid of the first row, which is NaN since it did not have a previous
-    # row to calculate the differences
-    delta = delta[1:]
-
-    # Make the positive gains (up) and negative gains (down) Series
-    up, down = delta.copy(), delta.copy()
-    up[up < 0] = 0
-    down[down > 0] = 0
-
-    # Calculate the EWMA
-    roll_up1 = up.ewm().mean()
-    roll_down1 = down.abs().ewm().mean()
-
-    # Calculate the RSI based on EWMA
-    RS1 = roll_up1 / roll_down1
-    RSI1 = 100.0 - (100.0 / (1.0 + RS1))
-
-    hasHighMomentum = RSI1 > 70.0  # change momentum screening here
-    return (hasHighMomentum, RSI1)
-
-# list of stock symbols from pool
-#stockPool = get_stock_pool()
-
-# openPrices is a dictionary of (stockSymbol) -> (stocks opening price)
+    current = si.get_live_price(ticker)
+    return current
 
 
-def getOpenPrice(ticker):
-    barset = api.get_barset(ticker, 'day', limit=1)
-    barset = barset[ticker]
-    return barset[0].o
+def get_drawdown(ticker, open_price=None, current_price=None):
+    """
+    Gets the current price for the given ticker. Uses Yahoo Finance.
+    :params:
+        ticker: ticker of stock.
+        open_price: The opening price of given stock. If not passed, sets internally.
+        current_price: The current price of given stock. If not passed, sets internally.
+    :return: the percentage change from open to now. 
+    """
+
+    if open_price is None:
+        open_price = getOpenPrice(ticker)
+    if current_price is None:
+        current_price = si.get_live_price(ticker)
+    print(current_price)
+    print(open_price)
+    currentOverOpenPrice = current_price / open_price
+    percentDrop = -1
+    if (0.98 < currentOverOpenPrice and currentOverOpenPrice < 0.99):
+        percentDrop = 1.0 - currentOverOpenPrice
+    return percentDrop
 
 
-def getOpenPrices():
-    updateOpenPrices = {}
-    stocks = get_stock_pool()
-    for stockSymbol in stocks:
-        try:
-            stockOpenPrice = getOpenPrice(stockSymbol)
-            print('open price is %s', stockOpenPrice)
-        except:
-            print("No open price")
-            stockOpenPrice = -1
-        # print(openPrice)
-        updateOpenPrices[stockSymbol] = stockOpenPrice
-    openPrices = updateOpenPrices
-    return openPrices
+def get_close_price(ticker):
+    """
+    Gets the close price for the given ticker. Uses Polygon through Aplaca.
+    :param 
+        ticker: ticker of stock.
+    :return: the close price 
+    """
+
+    today = datetime.now()
+    last_close_day = prev_weekday(today)
+    try:
+        close = api.polygon.daily_open_close(ticker, last_close_day).close
+    except:
+        return -1
+    return close
 
 
-# During 6:00 - 6:15 compare opening price to current, printing a stock symbol if
-# the drop criteria and the momentum criteria is met
-
-#date_now = datetime.now(est)
-#lower_bound = date_now.replace(hour=9, minute=1)
-#upper_bound = date_now.replace(hour=9, minute=15)
-# while lower_bound < datetime.now(est) < upper_bound:
-# for stock in stockPool:
-#open_price = openPrices[stock]
-#current = si.get_live_price(stock)
-#currentOverOpenPrice = current / open_price
-#stockMomentum = momentum(stock)
-# if .98 < currentOverOpenPrice < .99 and stockMomentum[0]: #change drop parameters here
-#percentDrop = 1.0 - currentOverOpenPrice
-#rsi = stockMomentum[1]
-# stockInfo = {
-# symbol": stock,
-# "percentDrop": percentDrop,
-# "rsi": rsi
-# }
-#stockInfoJson = json.dumps(stockInfo)
-# print(stockInfoJson)
+def prev_weekday(adate):
+    adate -= timedelta(days=1)
+    while adate.weekday() > 4:  # Mon-Fri are 0-4
+        adate -= timedelta(days=1)
+    return adate
 
 
-def get_drawdowns():
-    currentDictionary = {}
-    for ticker in stocks:
-        open_price = openPrices[ticker]
-        current = si.get_live_price(ticker)
-        currentOverOpenPrice = current / open_price
-        if (0.98 < currentOverOpenPrice and currentOverOpenPrice < 0.99):
-            percentDrop = 1.0 - currentOverOpenPrice
-            currentDictionary[ticker] = percentDrop
-    stockInfoJson = json.dumps(currentDictionary)
-    return stockInfoJson
+def get_all_data(ticker):
+    """
+    Calls all the methods within this script to aggregate and return singular dict file for
+    API usage and parsing. 
+    :param 
+        ticker: ticker of stock.
+    :return: dict of open, close, current, drawdown percentage, ticker, and boolean to display or not. 
+    """
+
+    data_dictionary = {}
+    data_dictionary["Symbol"] = ticker
+    open_price = get_open_price(ticker)
+    data_dictionary["Open Price"] = open_price
+    close_price = get_close_price(ticker)
+    data_dictionary["Previous Close Price"] = close_price
+    current_price = get_current_price(ticker)
+    data_dictionary["Current Price"] = current_price
+    drawdown_percentage = get_drawdown(
+        ticker, open_price=open_price, current_price=current_price)
+    data_dictionary["Drawdown % "] = drawdown_percentage
+    display = drawdown_percentage > 1
+    data_dictionary['Display?'] = display
+    return data_dictionary
