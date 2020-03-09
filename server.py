@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from waitress import serve
 
 from error import InvalidUsage
@@ -6,6 +7,7 @@ from error import InvalidUsage
 from stockFilter import get_all_data
 
 app = Flask(__name__)
+CORS(app)
 
 
 def has_args(iterable, args):
