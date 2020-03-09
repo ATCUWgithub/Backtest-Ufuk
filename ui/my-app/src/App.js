@@ -81,7 +81,6 @@ class TestChart extends Component {
     } else {
       return null;
     }
-    
   }
 }
 
