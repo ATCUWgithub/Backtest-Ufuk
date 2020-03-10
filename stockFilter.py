@@ -2,6 +2,8 @@ import alpaca_trade_api as tradeapi
 from yahoo_fin import stock_info as si
 from pytz import timezone
 from datetime import datetime, timedelta
+import yfinance as yf
+
 
 API_KEY = "PK8CRHTYAD6NW2DUW5M0"
 API_SECRET_KEY = "V9UJOZoTXcb0oc8Lks/VqD0JSBYoZWeDR5Am8tH/"
@@ -19,12 +21,14 @@ def get_open_price(ticker):
     :return: the opening price 
     """
 
-    today = datetime.now()
     try:
-        open_price = api.polygon.daily_open_close(ticker, today).open
+        barset = api.get_barset(ticker, 'day', limit=1)
+        barset = barset[ticker]
     except:
         return -1
-    return open_price
+    return barset[0].o
+
+    today = datetime.now()
 
 
 def get_current_price(ticker):
@@ -50,16 +54,11 @@ def get_drawdown(ticker, open_price=None, current_price=None):
     """
 
     if open_price is None:
-        open_price = getOpenPrice(ticker)
+        open_price = get_open_price(ticker)
     if current_price is None:
         current_price = si.get_live_price(ticker)
-    print(current_price)
-    print(open_price)
-    currentOverOpenPrice = current_price / open_price
-    percentDrop = -1
-    if (0.98 < currentOverOpenPrice and currentOverOpenPrice < 0.99):
-        percentDrop = 1.0 - currentOverOpenPrice
-    return percentDrop
+    percent = (current_price - open_price) / current_price
+    return percent
 
 
 def get_close_price(ticker):
@@ -70,10 +69,14 @@ def get_close_price(ticker):
     :return: the close price 
     """
 
+
+    stock = yf.Ticker(ticker)
+
     today = datetime.now()
     last_close_day = prev_weekday(today)
     try:
-        close = api.polygon.daily_open_close(ticker, last_close_day).close
+        rightday = datetime(last_close_day.year, last_close_day.month, last_close_day.day)
+        close = stock.history(interval="1m", end=rightday.isoformat().split('T')[0], start=(rightday - timedelta(days=1)).isoformat().split('T')[0]).iloc[-1].Close
     except:
         return -1
     return close
@@ -94,7 +97,7 @@ def get_all_data(ticker):
         ticker: ticker of stock.
     :return: dict of open, close, current, drawdown percentage, ticker, and boolean to display or not. 
     """
-
+    print('IN THE FUNC')
     data_dictionary = {}
     data_dictionary["Symbol"] = ticker
     open_price = get_open_price(ticker)
@@ -104,8 +107,8 @@ def get_all_data(ticker):
     current_price = get_current_price(ticker)
     data_dictionary["Current Price"] = current_price
     drawdown_percentage = get_drawdown(
-        ticker, open_price=open_price, current_price=current_price)
-    data_dictionary["Drawdown % "] = drawdown_percentage
-    display = drawdown_percentage > 1
-    data_dictionary['Display?'] = display
+        ticker, open_price=open_price, current_price=current_price) * 100
+    data_dictionary["percent change"] = drawdown_percentage
+    display = drawdown_percentage < -1
+    data_dictionary['Display?'] = bool(display)
     return data_dictionary

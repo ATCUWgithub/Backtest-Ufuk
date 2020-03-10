@@ -34,6 +34,8 @@ def handle_invalid_usage(error):
 
 @app.route('/getData', methods=['POST'])
 def updateOpenPrices():
+    print(request)
+    print(request.json)
     if not has_args(request.json, ['ticker']):
         raise InvalidUsage('Please provide ticker to get the open price for.')
 
@@ -51,4 +53,4 @@ if __name__ == '__main__':
     app.run(threaded=True)
 
 
-serve(app, host='0.0.0.0', port=3000)
+serve(app, host='0.0.0.0', port=5000, threads=350)
