@@ -42,22 +42,25 @@ class App extends Component {
 
 
   render() {
-    let stockCards = this.state.stocks.map((eachStock) => {
-      console.log(eachStock);
-      return <StockCard value={eachStock}/>;
-    });
-    return (
-      <div>
-        <div className="stock-cards">
-          {stockCards}
-        </div>
+    // let stockCards = this.state.stocks.map((eachStock) => {
+    //   console.log(eachStock);
+    //   return <StockCard value={eachStock}/>;
+    // });
+    // return (
+    //   <div>
+    //     <div className="stock-cards">
+    //       {stockCards}
+    //     </div>
         
-        {/*to start off put table here*/}        
+    //     {/*to start off put table here*/}        
+    //   </div>
+    // );
+    return(
+      <div>
+        <Tickers tickers={SAMPLE_DATA.stocks} />
+
       </div>
-    );
-    // return(
-    //   <Tickers tickers = {['AAPL', 'MSFT']}/>
-    // )
+    )
   }
 }
 

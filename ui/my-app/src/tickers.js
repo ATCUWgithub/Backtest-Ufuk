@@ -1,4 +1,10 @@
 import React from 'react';
+import {
+  Card, CardImg, CardText, CardBody,
+  CardTitle, CardSubtitle, Button
+} from 'reactstrap';
+import TestChart from './testchart'
+import './stockCard.css';
 
 const TickerData = ({ ticker }) => {
   const [loading, changeLoading] = React.useState(true);
@@ -22,31 +28,42 @@ const TickerData = ({ ticker }) => {
 
   if (loading) {
     return (
-      <div>
-        <p>Loading...</p>
-      </div>
+      <Card>
+        <p>Loading...</p>
+      </Card>
+
     )
   } 
 console.log(data)
-  return (
-    <div>
-      <p>{data['Symbol']}</p>
-      <ul>
-        <li>
-          {data['Current Price']}
-        </li>
-        <li>
-          {data['Open Price']}
-        </li>
-        <li>
-          {data['Previous Close Price']}
-        </li>
-        <li>
-          {data['percent change']}
-        </li>
-      </ul>
-    </div>
-  );
+const show = data['Display?']
+if (show) {
+  return (
+    <div>
+      <div >
+
+        {/* <TestChart value={data['Symbol']} /> */}
+        <div>
+          <Card>
+            <CardImg top width="100%" alt="Card image cap" />
+            <CardBody>
+              <CardTitle>{data['Symbol']}</CardTitle>
+              <CardSubtitle> % change: {data['percent change']}</CardSubtitle>
+              <CardText>
+                <ul>
+                  <li>Current Price: {data['Current Price']}</li>
+                  <li>Current Price: {data['Open Price']}</li>
+                  <li>Current Price: {data['Previous Close Price']}</li>
+                </ul>
+              </CardText>
+              <Button>Button</Button>
+            </CardBody>
+          </Card>
+        </div>
+      </div >
+    </div>
+  );
+}
+return null;
 }
 
 //takes in array of tickers
@@ -54,6 +71,7 @@ const Tickers = ({ tickers }) => {
   return (
     <div>
       {tickers.map((ticker, i) => {
+        console.log(ticker)
         return <TickerData ticker={ticker} key={i} />
       })}
     </div>
