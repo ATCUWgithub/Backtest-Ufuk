@@ -5,7 +5,7 @@ from waitress import serve
 from error import InvalidUsage
 
 from stockFilter import get_all_data
-
+from stockFilter import get_chart_data
 app = Flask(__name__)
 CORS(app)
 
@@ -47,6 +47,13 @@ def updateOpenPrices():
     data_json = jsonify(data)
     return data_json
 
+@app.route('/getCharting', methods = ['POST'])
+def charting():
+    if not has_args(request.json, ['ticker']):
+        raise InvalidUsage('Please provide ticker to get the chart data for.')
+    data = get_chart_data(request.json['ticker'])
+    data_json = jsonify(data)
+    return data_json
 
 if __name__ == '__main__':
     app.debug = True

@@ -112,3 +112,15 @@ def get_all_data(ticker):
     display = drawdown_percentage < -1
     data_dictionary['Display?'] = bool(display)
     return data_dictionary
+
+
+def get_chart_data(ticker):
+    barset = api.get_barset(ticker, 'minute', limit=200,
+                            start=datetime.now().isoformat())
+    data = barset[ticker]
+    total = {}
+    for i in range(len(data)):
+        ret = {}
+        row = data[i]
+        total[row.t.isoformat().split('T')[1]] = row.c
+    return total
