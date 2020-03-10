@@ -1,38 +1,6 @@
 {
     "stocks": [
-        {
-            "ticker": "stock1",
-            "price": [14,25,32,12,32],
-            "time": [5,10,15,20,25]
-        },
-        {
-            "ticker": "stock2",
-            "price": [32,14,25,12,32],
-            "time": [5,10,15,20,25]
-        },
-        {
-            "ticker": "stock3",
-            "price": [32,14,25,12,32],
-            "time": [5,10,15,20,25]
-        },
-        {
-            "ticker": "stock4",
-            "price": [14,25,32,12,32],
-            "time": [5,10,15,20,25]
-        },
-        {
-            "ticker": "stock5",
-            "price": [25,12,32,32,14],
-            "time": [5,10,15,20,25]
-        }
-    ],
+        "AAPL", "MSFT", "FB", "TMF"
+    ]
 
-    "response": {
-        "Current Price": 289.0299987792969,
-        "Display?": false,
-        "Drawdown % ": -1,
-        "Open Price": -1,
-        "Previous Close Price": 287.61,
-        "Symbol": "AAPL"
-    }
 }

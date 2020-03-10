@@ -5,7 +5,7 @@ from waitress import serve
 from error import InvalidUsage
 
 from stockFilter import get_all_data
-
+from stockFilter import get_chart_data
 app = Flask(__name__)
 CORS(app)
 
@@ -34,6 +34,8 @@ def handle_invalid_usage(error):
 
 @app.route('/getData', methods=['POST'])
 def updateOpenPrices():
+    print(request)
+    print(request.json)
     if not has_args(request.json, ['ticker']):
         raise InvalidUsage('Please provide ticker to get the open price for.')
 
@@ -45,10 +47,17 @@ def updateOpenPrices():
     data_json = jsonify(data)
     return data_json
 
+@app.route('/getCharting', methods = ['POST'])
+def charting():
+    if not has_args(request.json, ['ticker']):
+        raise InvalidUsage('Please provide ticker to get the chart data for.')
+    data = get_chart_data(request.json['ticker'])
+    data_json = jsonify(data)
+    return data_json
 
 if __name__ == '__main__':
     app.debug = True
     app.run(threaded=True)
 
 
-serve(app, host='0.0.0.0', port=3000)
+serve(app, host='0.0.0.0', port=5000, threads=350)

@@ -8,7 +8,15 @@ import CanvasJSReact from './canvasjs.react';
 import {ExampleChart} from './chart';
 import './stockCard.css';
 //import Clock from 'react-clock';
+import Tickers from './tickers';
 import SAMPLE_DATA from './stocks.json';
+<<<<<<< HEAD
+
+=======
+import io from 'socket.io-client';
+
+console.log(SAMPLE_DATA.stocks);
+>>>>>>> f9cda765afa982a204efd29d547b634bf6e4319c
 
 
 const CanvasJS = CanvasJSReact.CanvasJS;
@@ -18,15 +26,27 @@ class App extends Component {
     super(props);
     this.state = {
       stocks:[],
-      response: {}
+      loading: true
     };
   }
+
+
   
-  componentDidMount() {
-    this.setState({stocks: SAMPLE_DATA.stocks, response: SAMPLE_DATA.response});
-  }
+  // async componentDidMount() {
+  //   this.setState({stocks: SAMPLE_DATA.stocks});
+
+  //   const url = 'http://localhost:5000/updateCurPrices';
+  //   const response = await fetch(url, {
+  //     mode: 'no-cors'
+  //   });
+  //   const data = response.json;
+  //   this.state.loading = false;
+  //   console.log('yay');
+  // }
+
 
   render() {
+<<<<<<< HEAD
     let stockCards = this.state.stocks.map((eachStock) => {
       console.log(eachStock);
       return <StockCard value={eachStock} response={this.state.response}/>;
@@ -36,10 +56,27 @@ class App extends Component {
         <div className="stock-cards">
           {stockCards}
         </div>
+=======
+    // let stockCards = this.state.stocks.map((eachStock) => {
+    //   console.log(eachStock);
+    //   return <StockCard value={eachStock}/>;
+    // });
+    // return (
+    //   <div>
+    //     <div className="stock-cards">
+    //       {stockCards}
+    //     </div>
+>>>>>>> f9cda765afa982a204efd29d547b634bf6e4319c
         
-        {/*to start off put table here*/}        
+    //     {/*to start off put table here*/}        
+    //   </div>
+    // );
+    return(
+      <div>
+        <Tickers tickers={SAMPLE_DATA.stocks} />
+
       </div>
-    );
+    )
   }
 }
 
@@ -81,6 +118,7 @@ class TestChart extends Component {
     } else {
       return null;
     }
+    
   }
 }
 
@@ -88,13 +126,21 @@ class StockCard extends Component {
   render() {
     return (
       <div >
+        
         <Card>
           <TestChart value={this.props.value} />
         
+<<<<<<< HEAD
             <CardBody>
               <CardText>{this.props.response}</CardText>
               <Button>Button</Button>
             </CardBody>
+=======
+          <CardBody>
+            <CardText>{this.props.value}</CardText>
+            <Button>Button</Button>
+          </CardBody>
+>>>>>>> f9cda765afa982a204efd29d547b634bf6e4319c
 
         </Card>
       </div > 
