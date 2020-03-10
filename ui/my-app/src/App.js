@@ -10,13 +10,9 @@ import './stockCard.css';
 //import Clock from 'react-clock';
 import Tickers from './tickers';
 import SAMPLE_DATA from './stocks.json';
-<<<<<<< HEAD
-
-=======
 import io from 'socket.io-client';
 
 console.log(SAMPLE_DATA.stocks);
->>>>>>> f9cda765afa982a204efd29d547b634bf6e4319c
 
 
 const CanvasJS = CanvasJSReact.CanvasJS;
@@ -46,17 +42,6 @@ class App extends Component {
 
 
   render() {
-<<<<<<< HEAD
-    let stockCards = this.state.stocks.map((eachStock) => {
-      console.log(eachStock);
-      return <StockCard value={eachStock} response={this.state.response}/>;
-    });
-    return (
-      <div>
-        <div className="stock-cards">
-          {stockCards}
-        </div>
-=======
     // let stockCards = this.state.stocks.map((eachStock) => {
     //   console.log(eachStock);
     //   return <StockCard value={eachStock}/>;
@@ -66,7 +51,6 @@ class App extends Component {
     //     <div className="stock-cards">
     //       {stockCards}
     //     </div>
->>>>>>> f9cda765afa982a204efd29d547b634bf6e4319c
         
     //     {/*to start off put table here*/}        
     //   </div>
@@ -130,17 +114,10 @@ class StockCard extends Component {
         <Card>
           <TestChart value={this.props.value} />
         
-<<<<<<< HEAD
-            <CardBody>
-              <CardText>{this.props.response}</CardText>
-              <Button>Button</Button>
-            </CardBody>
-=======
           <CardBody>
             <CardText>{this.props.value}</CardText>
             <Button>Button</Button>
           </CardBody>
->>>>>>> f9cda765afa982a204efd29d547b634bf6e4319c
 
         </Card>
       </div > 
