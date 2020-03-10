@@ -9,7 +9,7 @@ import {ExampleChart} from './chart';
 import './stockCard.css';
 //import Clock from 'react-clock';
 import SAMPLE_DATA from './stocks.json';
-console.log(SAMPLE_DATA.stocks);
+
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
@@ -29,7 +29,7 @@ class App extends Component {
   render() {
     let stockCards = this.state.stocks.map((eachStock) => {
       console.log(eachStock);
-      return <StockCard value={eachStock} />;
+      return <StockCard value={eachStock} response={this.state.response}/>;
     });
     return (
       <div>
@@ -92,7 +92,7 @@ class StockCard extends Component {
           <TestChart value={this.props.value} />
         
             <CardBody>
-              <CardText>Information about the stock...</CardText>
+              <CardText>{this.props.response}</CardText>
               <Button>Button</Button>
             </CardBody>
 

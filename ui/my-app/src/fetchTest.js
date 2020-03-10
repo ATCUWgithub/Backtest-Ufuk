@@ -1,5 +1,5 @@
-let uri = 'http://127.0.0.1:5000/getData'
-fetch("http://127.0.0.1:5000/getData", {
+let uri = 'http://127.0.0.1:3000/getData'
+fetch("http://127.0.0.1:3000/getData", {
     method: "POST",
     mode: "cors",
     headers: {
