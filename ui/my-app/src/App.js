@@ -22,7 +22,7 @@ class App extends Component {
     super(props);
     this.state = {
       stocks:[],
-      loading: true
+      loading: true  //this state is not used
     };
   }
 
@@ -65,7 +65,7 @@ class App extends Component {
 }
 
 
-class TestChart extends Component {
+export class TestChart extends Component {
   render() {
     let coordinates = [];
     for(let index in this.props.value.price) {

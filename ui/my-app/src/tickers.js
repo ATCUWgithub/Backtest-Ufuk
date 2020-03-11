@@ -3,7 +3,7 @@ import {
   Card, CardImg, CardText, CardBody,
   CardTitle, CardSubtitle, Button
 } from 'reactstrap';
-import TestChart from './testchart'
+import TestChart from './testchart';
 import './stockCard.css';
 
 const TickerData = ({ ticker }) => {
@@ -45,6 +45,7 @@ if (show) {
         <div>
           <Card>
             <CardImg top width="100%" alt="Card image cap" />
+            <TestChart ticker={ticker} />
             <CardBody>
               <CardTitle>{data['Symbol']}</CardTitle>
               <CardSubtitle> % change: {data['percent change']}</CardSubtitle>
@@ -71,7 +72,7 @@ const Tickers = ({ tickers }) => {
   return (
     <div>
       {tickers.map((ticker, i) => {
-        console.log(ticker)
+        //console.log(ticker)
         return <TickerData ticker={ticker} key={i} />
       })}
     </div>
