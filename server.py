@@ -3,9 +3,12 @@ from flask_cors import CORS
 from waitress import serve
 
 from error import InvalidUsage
-
+from stockFilter import prep_all
 from stockFilter import get_all_data
 from stockFilter import get_chart_data
+from stockFilter import get_pricing
+from stockFilter import getOpens
+
 app = Flask(__name__)
 CORS(app)
 
@@ -52,8 +55,29 @@ def charting():
     if not has_args(request.json, ['ticker']):
         raise InvalidUsage('Please provide ticker to get the chart data for.')
     data = get_chart_data(request.json['ticker'])
+    data_json = data
+    return data_json
+
+
+@app.route('/getPricingUpdate', methods=['POST'])
+def pricing():
+    if not has_args(request.json, ['ticker']):
+        raise InvalidUsage('Please provide ticker to get the chart data for.')
+    data = get_pricing(request.json['ticker'])
     data_json = jsonify(data)
     return data_json
+
+@app.route('/getAll', methods = ['GET'])
+def getAll():
+    data = prep_all()
+    data_json = jsonify(data)
+    return data_json
+
+@app.route('/getOpens', methods=['GET'])
+def gettingOpens():
+    getOpens()
+    return 'done!'
+
 
 if __name__ == '__main__':
     app.debug = True

@@ -3,26 +3,36 @@ import {
   Card, CardImg, CardText, CardBody,
   CardTitle, CardSubtitle, Button
 } from 'reactstrap';
-import TestChart from './testchart'
+import TestChart from './testchart';
 import './stockCard.css';
+import Chart from './chart';
+import axios from 'axios';
+
 
 const TickerData = ({ ticker }) => {
   const [loading, changeLoading] = React.useState(true);
   const [data, changeData] = React.useState(null);
+  const [care, changeCare] = React.useState(true);
+
 
   React.useEffect(() => {
     async function getData() {
       try {
-        const response = await fetch('http://localhost:5000/getData',
+        const response = await fetch('http://localhost:5000/getCharting',
           { method: 'POST', body: JSON.stringify({ 'ticker': ticker }), headers: { "Content-Type": "application/json"}}
         ); 
-        const data = await response.json();
-        changeData(data);
+        const dat = await response.json();
+        changeData(dat);
+        console.log(dat);
         changeLoading(false);
+        if (String(dat.ending['Display?']) != 'true')  {
+          changeCare(false);
+        }
       } catch(e) {
         console.error(e);
       }
     }
+
     getData();
   }, []);
 
@@ -34,32 +44,13 @@ const TickerData = ({ ticker }) => {
 
     )
   } 
-console.log(data)
-const show = data['Display?']
-if (show) {
+// console.log(pricing);
+if  (care) {
   return (
-    <div>
-      <div >
-
-        {/* <TestChart value={data['Symbol']} /> */}
-        <div>
-          <Card>
-            <CardImg top width="100%" alt="Card image cap" />
-            <CardBody>
-              <CardTitle>{data['Symbol']}</CardTitle>
-              <CardSubtitle> % change: {data['percent change']}</CardSubtitle>
-              <CardText>
-                <ul>
-                  <li>Current Price: {data['Current Price']}</li>
-                  <li>Current Price: {data['Open Price']}</li>
-                  <li>Current Price: {data['Previous Close Price']}</li>
-                </ul>
-              </CardText>
-              <Button>Button</Button>
-            </CardBody>
-          </Card>
-        </div>
-      </div >
+    <div className='card mx-4'>
+      <Chart charting={data} />
+      <p className = 'text-center'>Open Price: {data.ending['open_price']}   </p>
+      <p className='text-center'>Previous Close Price: {data.ending['prev_close']}</p>
     </div>
   );
 }
@@ -68,11 +59,20 @@ return null;
 
 //takes in array of tickers
 const Tickers = ({ tickers }) => {
+  // const ask = (care) => {
+  //   // return true if care
+  // }
+
+
   return (
-    <div>
-      {tickers.map((ticker, i) => {
-        console.log(ticker)
-        return <TickerData ticker={ticker} key={i} />
+    
+    <div className="d-flex flex-wrap">
+      {tickers.map((ticker, i) => {
+
+          return (
+            <TickerData ticker={ticker} />
+          );
+        // }
       })}
     </div>
   )
