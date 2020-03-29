@@ -46,8 +46,7 @@ class App extends Component {
 
     return(
       <div >
-          <Tickers tickers={SAMPLE_DATA.stocks} />
-        {console.log(SAMPLE_DATA.stocks)}
+          <Tickers/>
         </div>
     )
   }

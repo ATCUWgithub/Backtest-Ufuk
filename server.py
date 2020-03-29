@@ -3,11 +3,14 @@ from flask_cors import CORS
 from waitress import serve
 
 from error import InvalidUsage
-from stockFilter import prep_all
+from stockFilter import getDDs
 from stockFilter import get_all_data
 from stockFilter import get_chart_data
 from stockFilter import get_pricing
 from stockFilter import getOpens
+from stockFilter import getBars
+from stockFilter import getCharts
+from stockFilter import get_support
 
 app = Flask(__name__)
 CORS(app)
@@ -59,6 +62,20 @@ def charting():
     return data_json
 
 
+@app.route('/getSupport', methods=['POST'])
+def support():
+    if not has_args(request.json, ['ticker']):
+        raise InvalidUsage('Please provide ticker to get the chart data for.')
+    data = get_support(request.json['ticker'])
+    data_json = data
+    return data_json
+
+@app.route('/getBatch', methods=['GET'])
+def batch():
+    data = getCharts()
+    data_json = data
+    return data_json
+
 @app.route('/getPricingUpdate', methods=['POST'])
 def pricing():
     if not has_args(request.json, ['ticker']):
@@ -67,9 +84,18 @@ def pricing():
     data_json = jsonify(data)
     return data_json
 
+
+@app.route('/test', methods=['POST'])
+def testing():
+    if not has_args(request.json, ['ticker']):
+        raise InvalidUsage('Please provide ticker to get the chart data for.')
+    data = getBars(request.json['ticker'])
+    data_json = jsonify(data)
+    return data_json
+
 @app.route('/getAll', methods = ['GET'])
 def getAll():
-    data = prep_all()
+    data = getDDs()
     data_json = jsonify(data)
     return data_json
 

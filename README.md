@@ -86,3 +86,11 @@ App.js renders 'Tickers'
 2. Create an interval for 'Chart' to update every 5-10 seconds.
 3. Recalculate drawdown for all every 40 - 60 seconds to determine which stocks to display
 BONUS. At the next refresh (to do #3), keep all prior display = 'true' stocks and provide a button to delete stocks until the next refresh (to do #3).
+
+
+WD
+
+in app:
+every min, call /getAll GET in App
+
+remove no-chart tickers. 
