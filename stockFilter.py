@@ -360,6 +360,11 @@ def getCharts():
 
                 
 def getDDs():
+    try:
+        opens = pd.read_csv('opens.csv', header=None)[0]
+    finally: 
+        print('no opens')
+        getOpens()
     def helper():
 
         # file1 = pd.read_csv('stocks1.csv', header=None)[0]
@@ -369,6 +374,7 @@ def getDDs():
         file3 = pd.read_csv('sliced3.csv', header=None)[0]
         file4 = pd.read_csv('sliced4.csv', header=None)[0]
         file5 = pd.read_csv('sliced5.csv', header=None)[0]
+        print(file5)
         # Create a queue to communicate with the worker threads
         queue = Queue()
         queue2 = Queue()
@@ -397,6 +403,7 @@ def getDDs():
             worker5.daemon = True
             worker5.start()
         # Put the tasks into the queue as a tuple
+        print('WORKERS STARTED')
         for i in range(len(file1)):
             try:
                 queue.put(file1.iloc[i])
